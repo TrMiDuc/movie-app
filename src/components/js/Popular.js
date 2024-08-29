@@ -7,7 +7,7 @@ const Popular = () => {
 
     const getMovie = async () => {
         try {
-            const res = await fetch('https://api.themoviedb.org/3/movie/popular?language=en-US&page=1&api_key=0ba35b46df83b841602ce49c6cda434b');
+            const res = await fetch('https://api.themoviedb.org/3/trending/all/day?language=en-US&page=1&api_key=0ba35b46df83b841602ce49c6cda434b');
             const data = await res.json();
             setFilm(data);
         } catch (error) {

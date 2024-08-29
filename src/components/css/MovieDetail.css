@@ -1,5 +1,37 @@
 .movie-img {
     height: 450px;
-    width: auto;
+    width: 300px;
     aspect-ratio: 2 / 3;
+}
+
+div.header.large.first {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    z-index: 1;
+    border-bottom: 1px solid rgba(var(--lightGrey), 1);
+    border-style: none;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+div.keyboard_s.custom_bg {
+    background-image: linear-gradient(to right, rgba(0, 1, 51, 1) calc((50vw - 170px) - 340px), rgba(0, 1, 51, 0.84) 50%, rgba(0, 1, 51, 0.84) 100%);
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.content {
+    width: 100%;
+    display: flex;
+}
+
+.words-detail {
+    padding-left: 20px;
 }
