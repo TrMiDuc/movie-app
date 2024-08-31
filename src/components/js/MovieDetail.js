@@ -3,18 +3,19 @@ import { useParams } from 'react-router-dom';
 import '../css/MovieDetail.css';
 import { Header } from './Header';
 import 'bootstrap';
+import { Recommendation } from './Recommendation';
+import { CommentBox } from './CommentBox';
 
 const MovieDetail = () => {
-    const { id } = useParams(); // Get the movie ID from the URL
+    const { type, id } = useParams();
 
     const [credits, setCredits] = useState(null);
     const [movie, setMovie] = useState(null);
-    const [trailerKey, setTrailerKey] = useState(null); // State to hold the trailer key
+    const [trailerKey, setTrailerKey] = useState(null);
 
-    // Fetch movie credits
     const getCreditDetails = async () => {
         try {
-            const res = await fetch(`https://api.themoviedb.org/3/movie/${id}/credits?api_key=0ba35b46df83b841602ce49c6cda434b`);
+            const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=0ba35b46df83b841602ce49c6cda434b`);
             const data = await res.json();
             setCredits(data); // Set the credits data
         } catch (error) {
@@ -25,7 +26,7 @@ const MovieDetail = () => {
     // Fetch movie details
     const getMovieDetail = async () => {
         try {
-            const res = await fetch(`https://api.themoviedb.org/3/movie/${id}?api_key=0ba35b46df83b841602ce49c6cda434b`);
+            const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=0ba35b46df83b841602ce49c6cda434b`);
             const data = await res.json();
             setMovie(data); // Set the movie data
         } catch (error) {
@@ -40,7 +41,7 @@ const MovieDetail = () => {
             const data = await res.json();
             const trailer = data.results.find(video => video.type === 'Trailer' && video.site === 'YouTube');
             if (trailer) {
-                setTrailerKey(trailer.key); // Set the trailer key if available
+                setTrailerKey(trailer.key);
             }
         } catch (error) {
             console.error('Error fetching movie trailer:', error);
@@ -50,10 +51,9 @@ const MovieDetail = () => {
     useEffect(() => {
         getCreditDetails();
         getMovieDetail();
-        getMovieTrailer();
+        if (type === 'movie') getMovieTrailer();
     }, [id]);
 
-    // Process the credits data
     const writers = credits?.crew.filter(person => person.job === 'Writer' || person.job === 'Screenplay') || [];
     const directors = credits?.crew.filter(person => person.job === 'Director') || [];
 
@@ -95,8 +95,8 @@ const MovieDetail = () => {
                                 <button></button>
                                 <button></button>
                                 {trailerKey && (
-                                    <button 
-                                        className='trailer' 
+                                    <button
+                                        className='trailer'
                                         onClick={() => window.open(`https://www.youtube.com/watch?v=${trailerKey}`, '_blank')}
                                     >
                                         Play Trailer
@@ -117,6 +117,9 @@ const MovieDetail = () => {
                     </div>
                 </div>
             </div>
+
+            <Recommendation />
+            <CommentBox />
         </>
     );
 };

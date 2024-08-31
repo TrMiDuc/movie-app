@@ -1,0 +1,33 @@
+.mt-4 {
+    max-width: calc(100vw - 20px);
+    width: 100%;
+    padding-left: 30;
+    padding-right: 0;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+.wrapper {
+	min-height: 0;
+	display: flex;
+	overflow-x: auto;
+}
+
+.wrapper::-webkit-scrollbar {
+	width: 0;
+}
+
+.item {
+	position: relative;
+	max-height: 500px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.recommend.img-fluid {
+	object-fit: contain;
+	height: 141px !important;
+	max-width: none;
+    aspect-ratio: unset !important;
+	border-radius: 10px;
+}

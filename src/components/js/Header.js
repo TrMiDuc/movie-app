@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../css/Header.css';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const Header = () => {
     const [searchQuery, setSearchQuery] = useState('');
@@ -47,9 +47,11 @@ const Header = () => {
             }}
         >
             <div className="header-left">
-                <h1>
-                    <a href="./index.js">Movies</a>
-                </h1>
+                <Link to='../../'>
+                    <h1>
+                        Movies
+                    </h1>
+                </Link>
             </div>
             <div className="header-right">
                 <div className="search">

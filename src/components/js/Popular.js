@@ -26,13 +26,13 @@ const Popular = () => {
                 <div className="wrapper">
                     {film.results.map(movie => (
                         <div className="item film-container text-center" key={movie.id}>
-                            <Link to={`/movie/${movie.id}`}>
+                            <Link to={`/${movie.media_type}/${movie.id}`}>
                                 <img loading='lazy'
                                     src={`https://image.tmdb.org/t/p/w200${movie.poster_path}`}
-                                    alt={movie.title}
+                                    alt={movie.title ? movie.title : movie.name}
                                     className="img-fluid"
                                 />
-                                <p className="film-title mt-2">{movie.title}</p>
+                                <p className="film-title mt-2">{movie.title ? movie.title : movie.name}</p>
                             </Link>
 
                             <div className="more-icon">
