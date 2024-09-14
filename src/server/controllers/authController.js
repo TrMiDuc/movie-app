@@ -21,15 +21,7 @@ exports.login = (req, res) => {
 
                 if (isMatch) {
                     const token = generateToken(user.user_id, user.username);
-                    
-                    res.cookie('auth_token', token, {
-                        httpOnly: true,
-                        secure: process.env.NODE_ENV === 'production',
-                        sameSite: 'None',
-                        maxAge: 3600 * 1000
-                    });
-
-                    res.send({ message: 'Login successful' });
+                    res.send({ message: 'Login successful', token });
                 } else {
                     res.status(401).send({ message: 'Invalid username or password' });
                 }

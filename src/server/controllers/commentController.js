@@ -1,14 +1,20 @@
 const db = require('../utils/db');
 
 exports.addComment = (req, res) => {
-    const { text, reply_to_comment_id } = req.body;
-    const user_id = req.user.id;
 
-    const commentQuery = 'INSERT INTO comments (text, user_id) VALUES (?, ?)';
+    const text = req.body.text;
+    const type = req.body.type;
+    const movie_id = req.body.movie_id;
+    const reply_to_comment_id = req.body.reply_to_comment_id ? req.body.reply_to_comment_id : null;
+    res.status(200).send(req.body);
+
+    const user_id = req.user.user_id;
+
+    const commentQuery = 'INSERT INTO comments (movie_id, type, user_id, comment_text) VALUES (?, ?, ?, ?)';
     
-    db.query(commentQuery, [text, user_id], (err, result) => {
+    db.query(commentQuery, [movie_id, type, user_id, text], (err, result) => {
         if (err) {
-            return res.status(500).send({ message: 'Error adding comment' });
+            return res.status(500).send({ message: 'Error adding comment' + err});
         }
 
         const newCommentId = result.insertId;
@@ -17,7 +23,7 @@ exports.addComment = (req, res) => {
             const replyQuery = 'INSERT INTO replies (comment_id, reply_to_comment_id) VALUES (?, ?)';
             db.query(replyQuery, [newCommentId, reply_to_comment_id], (err) => {
                 if (err) {
-                    return res.status(500).send({ message: 'Error adding reply' });
+                    return res.status(500).send({ message: 'Error adding reply'});
                 }
 
                 res.status(201).send({

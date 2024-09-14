@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import '../css/CommentBox.css';
 
@@ -6,11 +7,17 @@ const CommentBox = () => {
     const [comments, setComments] = useState([]);
     const [newComment, setNewComment] = useState('');
     const [replyText, setReplyText] = useState({});
+    const [activeReply, setActiveReply] = useState(null);
+    const location = useLocation();
+
+    const urlParts = location.pathname.split('/');
+    const type = urlParts[1];
+    const movie_id = urlParts[2];
 
     useEffect(() => {
         const fetchComments = async () => {
             try {
-                const response = await axios.get('http://localhost:5000/comments', {
+                const response = await axios.get(`http://localhost:5000/comments`, {
                     withCredentials: true
                 });
                 setComments(response.data);
@@ -20,7 +27,7 @@ const CommentBox = () => {
         };
 
         fetchComments();
-    }, []);
+    }, [type, movie_id]);
 
     const handleCommentChange = (e) => {
         setNewComment(e.target.value);
@@ -35,7 +42,11 @@ const CommentBox = () => {
             try {
                 const response = await axios.post(
                     'http://localhost:5000/comments',
-                    { text: newComment },
+                    {
+                        text: newComment,
+                        type: type,
+                        movie_id: movie_id
+                    },
                     { withCredentials: true }
                 );
                 setComments([...comments, response.data]);
@@ -51,7 +62,12 @@ const CommentBox = () => {
             try {
                 const response = await axios.post(
                     'http://localhost:5000/comments',
-                    { text: replyText[parentCommentId], reply_to_comment_id: parentCommentId },
+                    {
+                        text: replyText[parentCommentId],
+                        reply_to_comment_id: parentCommentId,
+                        type: type,
+                        movie_id: movie_id
+                    },
                     { withCredentials: true }
                 );
                 const updatedComments = comments.map((comment) => {
@@ -62,10 +78,15 @@ const CommentBox = () => {
                 });
                 setComments(updatedComments);
                 setReplyText({ ...replyText, [parentCommentId]: '' });
+                setActiveReply(null);
             } catch (err) {
                 console.error('Failed to add reply', err);
             }
         }
+    };
+
+    const toggleReplyBox = (commentId) => {
+        setActiveReply(activeReply === commentId ? null : commentId);
     };
 
     return (
@@ -86,6 +107,8 @@ const CommentBox = () => {
                         replyText={replyText}
                         handleReplyChange={handleReplyChange}
                         addReply={addReply}
+                        toggleReplyBox={toggleReplyBox}
+                        activeReply={activeReply}
                     />
                 ))}
             </ul>
@@ -93,37 +116,67 @@ const CommentBox = () => {
     );
 };
 
-const CommentItem = ({ comment, replyText, handleReplyChange, addReply }) => (
-    <li>
-        <p>{comment.text}</p>
-        <div className="comment-actions">
-            <button>Upvote ({comment.upvotes || 0})</button>
-            <button>Downvote ({comment.downvotes || 0})</button>
-        </div>
+const CommentItem = ({ comment, replyText, handleReplyChange, addReply, toggleReplyBox, activeReply }) => {
+    const commentRef = useRef(null);
 
-        <div className="reply-box">
-            <textarea
-                placeholder="Reply to this comment..."
-                value={replyText[comment.comment_id] || ''}
-                onChange={(e) => handleReplyChange(comment.comment_id, e.target.value)}
-            />
-            <button onClick={() => addReply(comment.comment_id)}>Reply</button>
-        </div>
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (commentRef.current && !commentRef.current.contains(event.target)) {
+                if (activeReply === comment.comment_id) {
+                    toggleReplyBox(null);
+                }
+            }
+        };
 
-        {comment.replies && (
-            <ul className="replies-list">
-                {comment.replies.map((reply) => (
-                    <CommentItem
-                        key={reply.comment_id}
-                        comment={reply}
-                        replyText={replyText}
-                        handleReplyChange={handleReplyChange}
-                        addReply={addReply}
-                    />
-                ))}
-            </ul>
-        )}
-    </li>
-);
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [activeReply, comment.comment_id, toggleReplyBox]);
+
+    return (
+        <li ref={commentRef}>
+            <div className="comment-actions">
+                <button className="upvote">▲</button>
+                <span>{parseInt(comment.upvote) - parseInt(comment.downvote)}</span>
+                <button className="downvote">▼</button>
+            </div>
+
+            <div className="comment-content">
+                <p className="comment-username">{comment.username}</p>
+                <p className="comment-text">{comment.comment_text}</p>
+                {activeReply === comment.comment_id && (
+                    <div className="reply-box">
+                        <textarea
+                            placeholder="Reply to this comment..."
+                            value={replyText[comment.comment_id] || ''}
+                            onChange={(e) => handleReplyChange(comment.comment_id, e.target.value)}
+                        />
+                        <button onClick={() => addReply(comment.comment_id)}>Reply</button>
+                    </div>
+                )}
+                <span className="reply-link" style={activeReply ? { display: 'none' } : { display: 'block' }} onClick={() => toggleReplyBox(comment.comment_id)}>
+                    Reply
+                </span>
+            </div>
+
+            {comment.replies && (
+                <ul className="replies-list">
+                    {comment.replies.map((reply) => (
+                        <CommentItem
+                            key={reply.comment_id}
+                            comment={reply}
+                            replyText={replyText}
+                            handleReplyChange={handleReplyChange}
+                            addReply={addReply}
+                            toggleReplyBox={toggleReplyBox}
+                            activeReply={activeReply}
+                        />
+                    ))}
+                </ul>
+            )}
+        </li>
+    );
+};
 
 export { CommentBox };
