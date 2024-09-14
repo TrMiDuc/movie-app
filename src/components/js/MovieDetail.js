@@ -17,24 +17,22 @@ const MovieDetail = () => {
         try {
             const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}/credits?api_key=0ba35b46df83b841602ce49c6cda434b`);
             const data = await res.json();
-            setCredits(data); // Set the credits data
+            setCredits(data);
         } catch (error) {
             console.error('Error fetching credit details:', error);
         }
     };
 
-    // Fetch movie details
     const getMovieDetail = async () => {
         try {
             const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=0ba35b46df83b841602ce49c6cda434b`);
             const data = await res.json();
-            setMovie(data); // Set the movie data
+            setMovie(data);
         } catch (error) {
             console.error('Error fetching movie details:', error);
         }
     };
 
-    // Fetch movie trailers
     const getMovieTrailer = async () => {
         try {
             const res = await fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=0ba35b46df83b841602ce49c6cda434b`);
@@ -77,7 +75,7 @@ const MovieDetail = () => {
                         <div className='words-detail'>
                             <h1 style={{ fontStyle: 'italic' }}>{movie.title}</h1>
                             <div className='facts'>
-                                <div>Released: {movie.release_date}</div>
+                                <div>Released: {(movie.release_date ? movie.release_date : movie.first_air_date)}</div>
                                 <div className='genre'>
                                     Genre: {
                                         movie.genres.map((genre, index) => (
@@ -87,7 +85,7 @@ const MovieDetail = () => {
                                         ))
                                     }
                                 </div>
-                                <div className='runtime'>Length: {parseInt(movie.runtime / 60)}h {movie.runtime % 60}m</div>
+                                <div className='runtime'>Length:  {movie.runtime ? parseInt(movie.runtime / 60) + "h" : ""} {movie.runtime ? (movie.runtime % 60) + "m" : "N/A"}</div>
                             </div>
 
                             <div className='action'>

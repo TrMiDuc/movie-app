@@ -1,7 +1,7 @@
 .head {
 	position: relative;
 	display: flex;
-	background: rgb(0,56,59,1);
+	background: rgb(0, 56, 59, 1);
 }
 
 .search {
@@ -10,9 +10,14 @@
 	padding-top: 1.5%;
 }
 
-.header-left, .header-right {
+.header-left,
+.header-right {
 	padding: 2vh 2vw 2vh;
 	width: 50%;
+}
+
+.header-left {
+	display: flex;
 }
 
 .btn {
@@ -23,26 +28,33 @@
 	border: none;
 }
 
-.btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active, .btn:hover, .btn:active, .btn:disabled{
-    color: black;
-    background-color: transparent;
-    border-color: none;
+.btn-check:checked+.btn,
+.btn.active,
+.btn.show,
+.btn:first-child:active,
+:not(.btn-check)+.btn:active,
+.btn:hover,
+.btn:active,
+.btn:disabled {
+	color: black;
+	background-color: transparent;
+	border-color: none;
 }
 
 .search-box {
 	display: block;
-    width: 100%;
-    padding: 0.375rem .75rem;
-    font-size: 1rem;
-    font-weight: 400;
-    line-height: 1.5;
-    color: var(--bs-body-color);
-    appearance: none;
-    background-color: var(--bs-body-bg);
-    background-clip: padding-box;
-    border: var(--bs-border-width) solid var(--bs-border-color);
-    border-radius: var(--bs-border-radius);
-    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+	width: 100%;
+	padding: 0.375rem .75rem;
+	font-size: 1rem;
+	font-weight: 400;
+	line-height: 1.5;
+	color: var(--bs-body-color);
+	appearance: none;
+	background-color: var(--bs-body-bg);
+	background-clip: padding-box;
+	border: var(--bs-border-width) solid var(--bs-border-color);
+	border-radius: var(--bs-border-radius);
+	transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
 }
 
 a {
@@ -51,7 +63,7 @@ a {
 	font-weight: 200;
 }
 
-.movie-app > .row {
+.movie-app>.row {
 	overflow-x: auto;
 	flex-wrap: nowrap;
 }
@@ -91,4 +103,56 @@ a {
 	transition: top 0.3s ease-in-out;
 	z-index: 1000;
 	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
+}
+
+
+/* Sidebar */
+.sidebar {
+    height: 100%; /* Full-height */
+    width: 250px; /* Set the width of the sidebar */
+    position: fixed; /* Fixed Sidebar (stay in place) */
+    top: 0;
+    left: -250px; /* Initially hide the sidebar off the screen */
+    background-color: #111; /* Black background color */
+    padding-top: 60px; /* Add some padding on top */
+    transition: 0.3s; /* Transition for sliding in and out */
+    z-index: 1000;
+}
+
+.sidebar.open {
+    left: 0; /* Slide in the sidebar */
+}
+
+.sidebar a {
+    padding: 10px 15px;
+	margin-top: 5px;
+    text-decoration: none;
+    font-size: 25px;
+    color: white;
+    display: block;
+    transition: 0.3s;
+}
+
+.sidebar a:hover {
+    background-color: #575757;
+}
+
+.close-btn {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    font-size: 36px;
+    margin-left: 50px;
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+}
+
+.menu-toggle {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    margin-right: 10px;
+}

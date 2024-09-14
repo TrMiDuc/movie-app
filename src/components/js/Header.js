@@ -1,10 +1,33 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import '../css/Header.css';
-import { useNavigate, Link } from 'react-router-dom';
+
+const getCookie = (name) => {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    if (parts.length === 2) return parts.pop().split(';').shift();
+    return null;
+};
 
 const Header = () => {
     const [searchQuery, setSearchQuery] = useState('');
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [username, setUsername] = useState('Guest');
     const navigate = useNavigate();
+    const location = useLocation();
+
+    useEffect(() => {
+        const token = getCookie('auth_token');
+        if (token) {
+            const payload = JSON.parse(atob(token.split('.')[1]));
+            const currentTime = Math.floor(Date.now() / 1000);
+            if (payload.exp > currentTime) {
+                setIsLoggedIn(true);
+                setUsername(payload.username);
+            }
+        }
+    }, []);
 
     const handleSearch = () => {
         if (searchQuery.trim()) {
@@ -38,6 +61,19 @@ const Header = () => {
         return () => window.removeEventListener('scroll', handleScroll);
     }, [prevScrollPos, visible]);
 
+    const toggleSidebar = () => {
+        setIsSidebarOpen(!isSidebarOpen);
+    };
+
+    const handleLogout = () => {
+        document.cookie = 'auth_token=; Max-Age=0; path=/;';
+        setIsLoggedIn(false);
+        setUsername('Guest');
+        navigate('/login');
+    };
+
+    const isLoginPage = location.pathname === '/login' || location.pathname === '/signup';
+
     return (
         <div
             className="head"
@@ -46,18 +82,51 @@ const Header = () => {
                 top: visible ? '0' : isAtTop ? 'auto' : '-100px',
             }}
         >
+            {!isLoginPage && (
+                <div className={`sidebar ${isSidebarOpen ? 'open' : ''}`}>
+                    <button className="close-btn" onClick={toggleSidebar}>×</button>
+
+                    {isLoggedIn ? (
+                        <>
+                            <Link to="#" onClick={handleLogout}>Log Out</Link>
+                            <div className="sidebar-user">
+                                <img src="/path/to/user/logo.png" alt="User Logo" className="user-logo" />
+                                <p>{username}</p>
+                            </div>
+                        </>
+                    ) : (
+                        <>
+                            <Link to="/login" onClick={toggleSidebar}>Log In</Link>
+                            <div className="sidebar-user">
+                                <img src="/path/to/guest/logo.png" alt="Guest Logo" className="guest-logo" />
+                                <p>Guest</p>
+                            </div>
+                        </>
+                    )}
+                </div>
+            )}
+
             <div className="header-left">
+                {!isLoginPage && (
+                    <button onClick={toggleSidebar} className="menu-toggle">
+                        ☰
+                    </button>
+                )}
                 <Link to='../../'>
-                    <h1>
-                        Movies
-                    </h1>
+                    <h1>Movies</h1>
                 </Link>
             </div>
+
             <div className="header-right">
                 <div className="search">
                     <i className="fa fa-search"></i>
-                    <input type="text" className="search-box" placeholder="search for a movies" value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}></input>
+                    <input
+                        type="text"
+                        className="search-box"
+                        placeholder="search for movies"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                     <button
                         className="btn btn-primary"
                         onClick={handleSearch}
@@ -71,7 +140,6 @@ const Header = () => {
             </div>
         </div>
     );
-}
-
+};
 
 export { Header };
