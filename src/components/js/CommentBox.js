@@ -17,7 +17,11 @@ const CommentBox = () => {
     useEffect(() => {
         const fetchComments = async () => {
             try {
-                const response = await axios.get(`http://localhost:5000/comments`, {
+                const response = await axios.get('http://localhost:5000/comments', {
+                    params: {
+                        movie_id: movie_id,
+                        type: type
+                    },
                     withCredentials: true
                 });
                 setComments(response.data);
@@ -72,6 +76,7 @@ const CommentBox = () => {
                 );
                 const updatedComments = comments.map((comment) => {
                     if (comment.comment_id === parentCommentId) {
+                        console.log({ ...comment, replies: [...(comment.replies || []), response.data] });
                         return { ...comment, replies: [...(comment.replies || []), response.data] };
                     }
                     return comment;
@@ -136,28 +141,29 @@ const CommentItem = ({ comment, replyText, handleReplyChange, addReply, toggleRe
 
     return (
         <li ref={commentRef}>
-            <div className="comment-actions">
-                <button className="upvote">▲</button>
-                <span>{parseInt(comment.upvote) - parseInt(comment.downvote)}</span>
-                <button className="downvote">▼</button>
-            </div>
-
-            <div className="comment-content">
-                <p className="comment-username">{comment.username}</p>
-                <p className="comment-text">{comment.comment_text}</p>
-                {activeReply === comment.comment_id && (
-                    <div className="reply-box">
-                        <textarea
-                            placeholder="Reply to this comment..."
-                            value={replyText[comment.comment_id] || ''}
-                            onChange={(e) => handleReplyChange(comment.comment_id, e.target.value)}
-                        />
-                        <button onClick={() => addReply(comment.comment_id)}>Reply</button>
-                    </div>
-                )}
-                <span className="reply-link" style={activeReply ? { display: 'none' } : { display: 'block' }} onClick={() => toggleReplyBox(comment.comment_id)}>
-                    Reply
-                </span>
+            <div className='comment-main' style={{display:'flex'}}>
+                <div className="comment-actions">
+                    <button className="upvote">▲</button>
+                    <span>{parseInt(comment.upvote) - parseInt(comment.downvote) || 0}</span>
+                    <button className="downvote">▼</button>
+                </div>
+                <div className="comment-content">
+                    <p className="comment-username">{comment.username}</p>
+                    <p className="comment-text">{comment.comment_text}</p>
+                    {activeReply === comment.comment_id && (
+                        <div className="reply-box">
+                            <textarea
+                                placeholder="Reply to this comment..."
+                                value={replyText[comment.comment_id] || ''}
+                                onChange={(e) => handleReplyChange(comment.comment_id, e.target.value)}
+                            />
+                            <button onClick={() => addReply(comment.comment_id)}>Reply</button>
+                        </div>
+                    )}
+                    <span className="reply-link" style={activeReply ? { display: 'none' } : { display: 'block' }} onClick={() => toggleReplyBox(comment.comment_id)}>
+                        Reply
+                    </span>
+                </div>
             </div>
 
             {comment.replies && (

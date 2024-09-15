@@ -7,6 +7,10 @@
     color: white;
 }
 
+.comment-content {
+    width: 100%;
+}
+
 .comment-box textarea {
     width: 100%;
     height: 60px;
@@ -17,10 +21,6 @@
     background-color: rgba(0, 1, 51, 0.8);
     color: white;
     resize: none;
-}
-
-.comment-content {
-    width: 100%;
 }
 
 .comment-box button {
@@ -45,13 +45,14 @@
 }
 
 .comments-list li {
-    display: flex;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     background-color: rgba(0, 1, 51, 0.8);
     color: white;
+    display: flex;
+    flex-direction: column; /* Ensure replies stack vertically */
 }
 
 .comment-actions {
@@ -92,21 +93,38 @@
 
 .reply-box {
     margin-top: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background-color: rgba(0, 1, 51, 0.8);
+}
+
+.reply-box textarea {
+    width: 100%;
+    height: 60px;
+    margin-bottom: 10px;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background-color: rgba(0, 1, 51, 0.8);
+    color: white;
 }
 
 .replies-list {
     list-style-type: none;
-    padding-left: 20px;
+    padding-left: 20px; /* Indentation for replies */
+    margin-top: 10px;   /* Space above replies */
 }
 
 .replies-list li {
-    display: flex;
     padding: 10px;
     margin-bottom: 10px;
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: 4px;
     background-color: rgba(0, 1, 51, 0.8);
     color: white;
+    display: flex;
+    flex-direction: column; /* Ensure nested replies stack vertically */
 }
 
 .reply-link {
@@ -119,14 +137,4 @@
 
 .reply-link:hover {
     color: #0056b3;
-}
-
-.reply-box {
-    margin-top: 10px;
-}
-
-.comment-actions {
-    display: flex;
-    align-items: center;
-    gap: 5px;
 }

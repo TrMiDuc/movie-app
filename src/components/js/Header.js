@@ -120,7 +120,6 @@ const Header = () => {
 
             <div className="header-right">
                 <div className="search">
-                    <i className="fa fa-search"></i>
                     <input
                         type="text"
                         className="search-box"

@@ -5,6 +5,8 @@ import { Header } from './Header';
 import 'bootstrap';
 import { Recommendation } from './Recommendation';
 import { CommentBox } from './CommentBox';
+import '@fortawesome/fontawesome-free/css/all.min.css';
+
 
 const MovieDetail = () => {
     const { type, id } = useParams();
@@ -89,15 +91,21 @@ const MovieDetail = () => {
                             </div>
 
                             <div className='action'>
-                                <button></button>
-                                <button></button>
-                                <button></button>
+                                <button className='add-to-list'>
+                                    <i className="fas fa-list"></i>
+                                </button>
+                                <button className='favorite'>
+                                    <i className="fas fa-heart"></i>
+                                </button>
+                                <button className='wishlist'>
+                                    <i className="fas fa-bookmark"></i>
+                                </button>
                                 {trailerKey && (
                                     <button
                                         className='trailer'
                                         onClick={() => window.open(`https://www.youtube.com/watch?v=${trailerKey}`, '_blank')}
                                     >
-                                        Play Trailer
+                                        <i className="fas fa-play"></i> Play Trailer
                                     </button>
                                 )}
                             </div>
