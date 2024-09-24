@@ -34,6 +34,7 @@ const SearchTemplate = () => {
     return (
         <>
             <Header />
+            <h1>Search for: {query}</h1>
             <div className="movies-search-grid">
                 {film && film.results ? (
                     film.results.length > 0 ? (

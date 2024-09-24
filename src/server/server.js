@@ -3,6 +3,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const authRoutes = require('./routes/auth');
 const commentRoutes = require('./routes/comment');
+const userActionRoutes = require('./routes/userAction');
+
 const cookieParser = require('cookie-parser');
 
 const app = express();
@@ -20,7 +22,10 @@ app.use(cookieParser());
 
 app.use('/auth', authRoutes);
 
+
 app.use('/comments', commentRoutes);
+
+app.use('/user-actions', userActionRoutes);
 
 app.listen(port, () => {
     console.log(`Server running on port ${port}`);

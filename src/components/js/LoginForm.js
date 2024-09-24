@@ -2,22 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../css/AuthForm.css';
 import { Header } from './Header';
-
-const getCookie = (name) => {
-    const value = `; ${document.cookie}`;
-    const parts = value.split(`; ${name}=`);
-    if (parts.length === 2) return parts.pop().split(';').shift();
-    return null;
-};
-
-const setCookie = (name, value, hours) => {
-    const expires = new Date(Date.now() + hours * 60 * 60 * 1000).toUTCString();
-    document.cookie = `${name}=${value}; expires=${expires}; path=/`;
-};
-
-const removeCookie = (name) => {
-    document.cookie = `${name}=; Max-Age=0; path=/;`;
-};
+import { useNavigate, Link } from 'react-router-dom';
 
 const LoginForm = ({ onLogin }) => {
     const [username, setUsername] = useState('');
@@ -25,39 +10,26 @@ const LoginForm = ({ onLogin }) => {
     const [error, setError] = useState('');
     const [status, setStatus] = useState('typing');
 
+    const navigate = useNavigate();
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setStatus('submitting');
         setError('');
 
         try {
-            var token = getCookie('auth_token');
-            if (token) {
-                const payload = JSON.parse(atob(token.split('.')[1]));
-                const currentTime = Math.floor(Date.now() / 1000);
-                if (payload.exp > currentTime) {
-                    removeCookie('auth_token');
-                }
-            }
-
             const response = await axios.post('http://localhost:5000/auth/login', {
                 username,
                 password,
             });
 
-            token = response.data.token;
-
-            setCookie('auth_token', token, 1);
-
+            const token = response.data.token;
+            document.cookie = `auth_token=${token}; path=/`;
             setStatus('success');
             onLogin(response.data.token);
+            navigate('/');
         } catch (err) {
-            if (err.response && err.response.data.message) {
-                setError(err.response.data.message);
-            } else {
-                console.log(err);
-                setError('An error occurred. Please try again.');
-            }
+            setError(err.response?.data?.message || 'An error occurred. Please try again.');
             setStatus('typing');
         }
     };
@@ -93,6 +65,9 @@ const LoginForm = ({ onLogin }) => {
                     </div>
                     <button type="submit" disabled={status === 'submitting'}>Login</button>
                 </form>
+                <p className="auth-toggle-text">
+                    Don't have an account? <Link to="/signup">Sign Up</Link>
+                </p>
             </div>
         </>
     );

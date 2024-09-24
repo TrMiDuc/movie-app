@@ -6,14 +6,17 @@ import 'bootstrap';
 import { Recommendation } from './Recommendation';
 import { CommentBox } from './CommentBox';
 import '@fortawesome/fontawesome-free/css/all.min.css';
-
+import axios from 'axios';
 
 const MovieDetail = () => {
     const { type, id } = useParams();
-
     const [credits, setCredits] = useState(null);
     const [movie, setMovie] = useState(null);
     const [trailerKey, setTrailerKey] = useState(null);
+
+    const [isInList, setIsInList] = useState(false);
+    const [isInWishlist, setIsInWishlist] = useState(false);
+    const [isFavorite, setIsFavorite] = useState(false);
 
     const getCreditDetails = async () => {
         try {
@@ -48,10 +51,67 @@ const MovieDetail = () => {
         }
     };
 
+    const checkUserActions = async () => {
+        try {
+            const res = await axios.get(`http://localhost:5000/user-actions`, {
+                params: { movie_id: id, type: type},
+                withCredentials: true
+            });
+            setIsInList(res.data.isInList);
+            setIsInWishlist(res.data.isInWishlist);
+            setIsFavorite(res.data.isFavorite);
+        } catch (error) {
+            console.error('Error checking user actions:', error);
+        }
+    };
+
+    const handleToggleList = async () => {
+        try {
+            if (isInList) {
+                await axios.delete('http://localhost:5000/user-actions/list', { data: { movie_id: id, type: type }, withCredentials: true });
+                setIsInList(false);
+            } else {
+                await axios.post('http://localhost:5000/user-actions/list', { movie_id: id, type: type }, { withCredentials: true });
+                setIsInList(true);
+            }
+        } catch (error) {
+            console.error('Error toggling list status:', error);
+        }
+    };
+
+    const handleToggleWishlist = async () => {
+        try {
+            if (isInWishlist) {
+                await axios.delete('http://localhost:5000/user-actions/wishlist', { data: { movie_id: id, type: type }, withCredentials: true });
+                setIsInWishlist(false);
+            } else {
+                await axios.post('http://localhost:5000/user-actions/wishlist', { movie_id: id, type: type }, { withCredentials: true });
+                setIsInWishlist(true);
+            }
+        } catch (error) {
+            console.error('Error toggling wishlist status:', error);
+        }
+    };
+
+    const handleToggleFavorite = async () => {
+        try {
+            if (isFavorite) {
+                await axios.delete('http://localhost:5000/user-actions/favorite', { data: { movie_id: id, type: type }, withCredentials: true });
+                setIsFavorite(false);
+            } else {
+                await axios.post('http://localhost:5000/user-actions/favorite', { movie_id: id, type: type }, { withCredentials: true });
+                setIsFavorite(true);
+            }
+        } catch (error) {
+            console.error('Error toggling favorite status:', error);
+        }
+    };
+
     useEffect(() => {
         getCreditDetails();
         getMovieDetail();
         if (type === 'movie') getMovieTrailer();
+        checkUserActions();
     }, [id]);
 
     const writers = credits?.crew.filter(person => person.job === 'Writer' || person.job === 'Screenplay') || [];
@@ -67,7 +127,6 @@ const MovieDetail = () => {
                 style={{
                     backgroundImage: `url(https://media.themoviedb.org/t/p/w1920_and_h800_multi_faces${movie.backdrop_path})`,
                 }}>
-
                 <div className='keyboard_s custom_bg'>
                     <div className="content">
                         <div className='img-detail'>
@@ -91,14 +150,14 @@ const MovieDetail = () => {
                             </div>
 
                             <div className='action'>
-                                <button className='add-to-list'>
-                                    <i className="fas fa-list"></i>
+                                <button className={`add-to-list ${isInList ? 'active' : ''}`} onClick={handleToggleList}>
+                                    <i className="fas fa-list"></i> {isInList ? 'Remove from List' : 'Add to List'}
                                 </button>
-                                <button className='favorite'>
-                                    <i className="fas fa-heart"></i>
+                                <button className={`favorite ${isFavorite ? 'active' : ''}`} onClick={handleToggleFavorite}>
+                                    <i className="fas fa-heart"></i> {isFavorite ? 'Remove from Favorite' : 'Add to Favorite'}
                                 </button>
-                                <button className='wishlist'>
-                                    <i className="fas fa-bookmark"></i>
+                                <button className={`wishlist ${isInWishlist ? 'active' : ''}`} onClick={handleToggleWishlist}>
+                                    <i className="fas fa-bookmark"></i> {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
                                 </button>
                                 {trailerKey && (
                                     <button

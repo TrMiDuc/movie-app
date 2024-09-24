@@ -76,7 +76,6 @@ const CommentBox = () => {
                 );
                 const updatedComments = comments.map((comment) => {
                     if (comment.comment_id === parentCommentId) {
-                        console.log({ ...comment, replies: [...(comment.replies || []), response.data] });
                         return { ...comment, replies: [...(comment.replies || []), response.data] };
                     }
                     return comment;
@@ -92,6 +91,28 @@ const CommentBox = () => {
 
     const toggleReplyBox = (commentId) => {
         setActiveReply(activeReply === commentId ? null : commentId);
+    };
+
+    const handleUpvote = async (commentId) => {
+        try {
+            await axios.post(`http://localhost:5000/comments/${commentId}/upvote`, {}, { withCredentials: true });
+            setComments(comments.map(comment =>
+                comment.comment_id === commentId ? { ...comment, upvote: comment.upvote + 1 } : comment
+            ));
+        } catch (err) {
+            console.error('Failed to upvote comment', err);
+        }
+    };
+
+    const handleDownvote = async (commentId) => {
+        try {
+            await axios.post(`http://localhost:5000/comments/${commentId}/downvote`, {}, { withCredentials: true });
+            setComments(comments.map(comment =>
+                comment.comment_id === commentId ? { ...comment, downvote: comment.downvote + 1 } : comment
+            ));
+        } catch (err) {
+            console.error('Failed to downvote comment', err);
+        }
     };
 
     return (
@@ -114,6 +135,8 @@ const CommentBox = () => {
                         addReply={addReply}
                         toggleReplyBox={toggleReplyBox}
                         activeReply={activeReply}
+                        handleUpvote={handleUpvote}
+                        handleDownvote={handleDownvote}
                     />
                 ))}
             </ul>
@@ -121,7 +144,7 @@ const CommentBox = () => {
     );
 };
 
-const CommentItem = ({ comment, replyText, handleReplyChange, addReply, toggleReplyBox, activeReply }) => {
+const CommentItem = ({ comment, replyText, handleReplyChange, addReply, toggleReplyBox, activeReply, handleUpvote, handleDownvote }) => {
     const commentRef = useRef(null);
 
     useEffect(() => {
@@ -143,9 +166,9 @@ const CommentItem = ({ comment, replyText, handleReplyChange, addReply, toggleRe
         <li ref={commentRef}>
             <div className='comment-main' style={{display:'flex'}}>
                 <div className="comment-actions">
-                    <button className="upvote">▲</button>
+                    <button className="upvote" onClick={() => handleUpvote(comment.comment_id)}>▲</button>
                     <span>{parseInt(comment.upvote) - parseInt(comment.downvote) || 0}</span>
-                    <button className="downvote">▼</button>
+                    <button className="downvote" onClick={() => handleDownvote(comment.comment_id)}>▼</button>
                 </div>
                 <div className="comment-content">
                     <p className="comment-username">{comment.username}</p>
@@ -177,6 +200,8 @@ const CommentItem = ({ comment, replyText, handleReplyChange, addReply, toggleRe
                             addReply={addReply}
                             toggleReplyBox={toggleReplyBox}
                             activeReply={activeReply}
+                            handleUpvote={handleUpvote}
+                            handleDownvote={handleDownvote}
                         />
                     ))}
                 </ul>

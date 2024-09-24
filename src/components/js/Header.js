@@ -89,9 +89,14 @@ const Header = () => {
 
                     {isLoggedIn ? (
                         <>
-                            <Link to="#" onClick={handleLogout}>Log Out</Link>
+                            <div className="option">
+                                <Link to="/wishlist" onClick={toggleSidebar}>Wishlist</Link>
+                                <Link to="/favorites" onClick={toggleSidebar}>Favorites</Link>
+                                <Link to="#" onClick={handleLogout}>Log Out</Link>
+                            </div>
+
                             <div className="sidebar-user">
-                                <img src="/path/to/user/logo.png" alt="User Logo" className="user-logo" />
+                                <img src="/user.png" alt="User Logo" className="user-logo" />
                                 <p>{username}</p>
                             </div>
                         </>
@@ -99,8 +104,8 @@ const Header = () => {
                         <>
                             <Link to="/login" onClick={toggleSidebar}>Log In</Link>
                             <div className="sidebar-user">
-                                <img src="/path/to/guest/logo.png" alt="Guest Logo" className="guest-logo" />
-                                <p>Guest</p>
+                                <img src="/guest_icon.png" alt="Guest Logo" className="guest-logo" />
+                                <p style={{ paddingTop: '7px', paddingLeft: '5px' }}>Guest</p>
                             </div>
                         </>
                     )}

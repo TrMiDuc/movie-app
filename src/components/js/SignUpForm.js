@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import axios from 'axios';
 import '../css/AuthForm.css';
 import { Header } from './Header';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const SignUpForm = ({ onSignUp }) => {
     const [username, setUsername] = useState('');
@@ -27,25 +27,20 @@ const SignUpForm = ({ onSignUp }) => {
         try {
             const response = await axios.post('http://localhost:5000/auth/signup', {
                 username,
-                password
+                password,
             });
             setStatus('success');
             onSignUp(response.data.user.username);
             navigate('/login');
         } catch (err) {
-            if (err.response && err.response.data.message) {
-                setError(err.response.data.message);
-            } else {
-                setError('An error occurred. Please try again.');
-                console.error(err);
-            }
+            setError(err.response?.data?.message || 'An error occurred. Please try again.');
             setStatus('typing');
         }
     };
 
     return (
         <>
-            <Header/>
+            <Header />
             <div className="auth-form">
                 <h2>Sign Up</h2>
                 {error && <p className="error-message">{error}</p>}
@@ -85,6 +80,9 @@ const SignUpForm = ({ onSignUp }) => {
                     </div>
                     <button type="submit" disabled={status === 'submitting'}>Sign Up</button>
                 </form>
+                <p className="auth-toggle-text">
+                    Already have an account? <Link to="/login">Login</Link>
+                </p>
             </div>
         </>
     );
