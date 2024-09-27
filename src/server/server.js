@@ -22,7 +22,6 @@ app.use(cookieParser());
 
 app.use('/auth', authRoutes);
 
-
 app.use('/comments', commentRoutes);
 
 app.use('/user-actions', userActionRoutes);

@@ -30,7 +30,7 @@ const MovieDetail = () => {
 
     const getMovieDetail = async () => {
         try {
-            const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=0ba35b46df83b841602ce49c6cda434b`);
+            const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}?api_key=0ba35b46df83b841602ce49c6cda434b&append_to_response=keywords`);
             const data = await res.json();
             setMovie(data);
         } catch (error) {
@@ -54,7 +54,7 @@ const MovieDetail = () => {
     const checkUserActions = async () => {
         try {
             const res = await axios.get(`http://localhost:5000/user-actions`, {
-                params: { movie_id: id, type: type},
+                params: { movie_id: id, type: type },
                 withCredentials: true
             });
             setIsInList(res.data.isInList);
@@ -116,6 +116,13 @@ const MovieDetail = () => {
 
     const writers = credits?.crew.filter(person => person.job === 'Writer' || person.job === 'Screenplay') || [];
     const directors = credits?.crew.filter(person => person.job === 'Director') || [];
+
+    const genres = movie?.genres.map(genre => genre.name) || [];
+    const keywords = (type === 'movie')
+        ? (movie?.keywords?.keywords.map(keyword => keyword.name) || [])
+        : (movie?.keywords?.results.map(keyword => keyword.name) || []);
+    const overview = movie?.overview;
+    const adult = movie?.adult ? "Adult" : "NotAdult";
 
     if (!movie) return <div>Loading...</div>;
 
@@ -183,7 +190,7 @@ const MovieDetail = () => {
                 </div>
             </div>
 
-            <Recommendation />
+            <Recommendation overview={overview} genres={genres} keywords={keywords} adult={adult} />
             <CommentBox />
         </>
     );

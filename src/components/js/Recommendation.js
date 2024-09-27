@@ -1,40 +1,48 @@
 import { Link, useParams } from 'react-router-dom';
 import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import '../css/Recommendation.css';
 
-const Recommendation = () => {
+const Recommendation = ({ overview, genres, keywords, adult }) => {
     const { type, id } = useParams();
     const [film, setFilm] = useState(null);
 
     const getRecommendations = async () => {
         try {
-            const res = await fetch(`https://api.themoviedb.org/3/${type}/${id}/recommendations?api_key=0ba35b46df83b841602ce49c6cda434b`);
-            const data = await res.json();
-            setFilm(data);
+            const requestData = {
+                overview,
+                genres,
+                keywords,
+                adult
+            };
+
+            const res = await axios.post('https://997b-35-199-3-137.ngrok-free.app/recommend', requestData);
+            setFilm(res.data);
         } catch (error) {
             console.error('Error fetching recommendations:', error);
         }
     };
 
     useEffect(() => {
+        setFilm(null);
         getRecommendations();
-    }, [type, id]);
+    }, [type, id, overview, genres, keywords, adult]);
 
-    if (!film || film.results.length === 0) return <div>No recommendations found.</div>;
+    if (!film || film.length === 0) return <div>Loading recommendations...</div>;
 
     return (
         <div className="recommend container mt-4">
             <h1 className='recommend' style={{ paddingBottom: '20px' }}>You may like</h1>
             <div className="wrapper">
-                {film.results.map(movie => (
+                {film.map(movie => (
                     <div className="item film-container text-center" key={movie.id}>
-                        <Link to={`/${movie.media_type}/${movie.id}`}>
+                        <Link to={`/movie/${movie.id}`}>
                             <img loading='lazy'
                                 src={`https://image.tmdb.org/t/p/w500_and_h282_face/${movie.backdrop_path}`}
                                 alt={movie.title ? movie.title : movie.name}
                                 className="recommend img-fluid"
                             />
-                            <p className="film-title mt-2">{movie.title ? movie.title : movie.name}</p>
+                            <p className="film-title mt-2">{movie.title}</p>
                         </Link>
                     </div>
                 ))}
